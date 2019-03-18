@@ -15,6 +15,8 @@ keypoints:
 - "`command > file` redirects a command's output to a file."
 - "`command >> file` redirects a command's output to a file without overwriting the existing contents of the file."
 - "`command_1 | command_2` redirects the output of the first command as input to the second command."
+- "for loops are used for iteration"
+- "`basename` gets rid of repetitive parts of names"
 ---
 
 ## Searching files
@@ -38,6 +40,14 @@ Let's give it a try!
 > 
 {: .callout}
 
+We'll search for strings inside of our fastq files. Let's first make sure we are in the correct 
+directory.
+
+~~~
+$ cd ~/shell_data/untrimmed_fastq
+~~~
+{: .bash}
+
 Suppose we want to see how many reads in our file have really bad segments containing 10 consecutive unknown nucleoties (Ns). Let's search for the string NNNNNNNNNN in the SRR098026 file.
 
 > ## Determining quality
@@ -56,9 +66,9 @@ $ grep NNNNNNNNNN SRR098026.fastq
 ~~~
 {: .bash}
 
-This command returns a lot of output to the terminal. Each line in the SRR098026 
-file which contains at least 10 consecutive Ns is printed to the terminal. We may be 
-interested not only in the actual sequence which contains this string, but 
+This command returns a lot of output to the terminal. Every single line in the SRR098026 
+file that contains at least 10 consecutive Ns is printed to the terminal, regardless of how long or short the file is. 
+We may be interested not only in the actual sequence which contains this string, but 
 in the name (or identifier) of that sequence. We discussed in a previous lesson 
 that the identifier line immediately precedes the nucleotide sequence for each read
 in a FASTQ file. We may also want to inspect the quality scores associated with
@@ -86,17 +96,17 @@ CNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
 
 > ## Exercise
 >
-> 1) Search for the sequence `GNATNACCACTTCC` in the `SRR098026.fastq` file.
+> 1. Search for the sequence `GNATNACCACTTCC` in the `SRR098026.fastq` file.
 > Have your search return all matching lines and the name (or identifier) for each sequence
 > that contains a match.
 > 
-> 2) Search for the sequence `AAGTT` in both FASTQ files.
+> 2. Search for the sequence `AAGTT` in both FASTQ files.
 > Have your search return all matching lines and the name (or identifier) for each sequence
 > that contains a match.
 > 
 > > ## Solution  
-> > 1) `grep -B1 GNATNACCACTTCC SRR098026.fastq`  
-> > 2) `grep -B1 AAGTT *.fastq`
+> > 1. `grep -B1 GNATNACCACTTCC SRR098026.fastq`  
+> > 2. `grep -B1 AAGTT *.fastq`
 > >
 > {: .solution}
 {: .challenge}
@@ -104,20 +114,20 @@ CNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
 ## Redirecting output
 
 `grep` allowed us to identify sequences in our FASTQ files that match a particular pattern. 
-But all of these sequences were printed to our terminal screen. In order to work with these 
+All of these sequences were printed to our terminal screen, but in order to work with these 
 sequences and perform other opperations on them, we will need to capture that output in some
 way. 
 
 We can do this with something called "redirection". The idea is that
-we're redirecting what was output to the terminal to another location. 
-In our case, we want to print this information to a file, so that we can look at it later and 
-do other analyses with this data.
+we are taking what would ordinarily be printed to the terminal screen and redirecting it to another location. 
+In our case, we want to print this information to a file so that we can look at it later and 
+use other commands to analyze this data.
 
 The command for redirecting output to a file is `>`.
 
 Let's try out this command and copy all the records (including all four lines of each record) 
 in our FASTQ files that contain 
-'NNNNNNNNNN' to another file called 'bad_reads.txt'.
+'NNNNNNNNNN' to another file called `bad_reads.txt`.
 
 ~~~
 $ grep -B1 -A2 NNNNNNNNNN SRR098026.fastq > bad_reads.txt
@@ -137,10 +147,10 @@ $ grep -B1 -A2 NNNNNNNNNN SRR098026.fastq > bad_reads.txt
 
 
 The prompt should sit there a little bit, and then it should look like nothing
-happened. But type `ls`. You should see a new file called bad_reads.txt. 
+happened. But type `ls`. You should see a new file called `bad_reads.txt`. 
 
 We can check the number of lines in our new file using a command called `wc`. 
-`wc` stands for `word count`. This command counts the number of words, lines, and characters
+`wc` stands for **word count**. This command counts the number of words, lines, and characters
 in a file. 
 
 ~~~
@@ -218,7 +228,7 @@ $ wc -l bad_reads.txt
 ~~~
 {: .output}
 
-Here, the output of our second  call to `wc` shows that we no longer have any lines in our bad_reads.txt file. This is 
+Here, the output of our second  call to `wc` shows that we no longer have any lines in our `bad_reads.txt` file. This is 
 because the second file we searched (`SRR097977.fastq`) does not contain any lines that match our
 search sequence. So our file was overwritten and is now empty.
 
@@ -285,35 +295,7 @@ $ wc -l bad_reads.txt
 > 
 {: .callout}
 
-So far we've searched for reads containing a long string of at least 10 unknown nucleotides. 
-We might also be interested in finding any reads with at least two shorter strings of 5 unknown 
-nucleotides, separated by any number of known nucleotides. Reads with more than one region of 
-ambiguity like this might be poor enough to not pass our quality filter. We can search for these
-reads using a wildcard within our search string for `grep`. 
-
-> ## Exercise
-> 
-> How many reads in the `SRR098026.fastq` file contain at least two regions of 5 unknown
-> nucleotides in a row, separated by any number of known nucleotides?
->
->> ## Solution
->> 
->> ~~~
->> $ grep "NNNNN*NNNNN" SRR098026.fastq > bad_reads_2.txt
->> $ wc -l bad_reads_2.txt
->> ~~~
->> {: .bash}
->> 
->> ~~~
->> 186 bad_reads_2.txt
->> ~~~
->> {: .output}
-> {: .solution}
-{: .challenge}
-
-
-We've now created two separate files to store the results of our search for reads matching 
-particular criteria. Since we might have multiple different criteria we want to search for, 
+Since we might have multiple different criteria we want to search for, 
 creating a new output file each time has the potential to clutter up our workspace. We also
 so far haven't been interested in the actual contents of those files, only in the number of 
 reads that we've found. We created the files to store the reads and then counted the lines in 
@@ -373,7 +355,7 @@ Let's use the tools we've added to our tool kit so far, along with a few new one
 
 ~~~
 $ cd
-$ cd dc_sample_data/sra_metadata
+$ cd shell_data/sra_metadata
 ~~~
 {: .bash}
 
@@ -532,36 +514,37 @@ $ cut -f3 SraRunTable.txt | grep -v LibraryLayout_s | sort | uniq -c
 {: .output}
 
 > ## Exercise
-> 1) How many different sample load dates are there?   
-> 2) How many samples were loaded on each date?  
+>
+> 1. How many different sample load dates are there?   
+> 2. How many samples were loaded on each date?  
 > 
 >> ## Solution
 >>  
->> There are two different sample load dates.  
+>> 1. There are two different sample load dates.  
 >>
->> ~~~
->> cut -f5 SraRunTable.txt | grep -v LoadDate_s | sort | uniq
->> ~~~
->> {: .bash}
+>>    ~~~
+>>    cut -f5 SraRunTable.txt | grep -v LoadDate_s | sort | uniq
+>>    ~~~
+>>    {: .bash}
 >>
->> ~~~
->> 25-Jul-12
->> 29-May-14
->> ~~~
->> {: .output}
+>>    ~~~
+>>    25-Jul-12
+>>    29-May-14
+>>    ~~~
+>>    {: .output}
 >>
->> Six samples were loaded on one date and 31 were loaded on the other.  
+>> 2. Six samples were loaded on one date and 31 were loaded on the other.
 >>
->> ~~~
->> cut -f5 SraRunTable.txt | grep -v LoadDate_s | sort | uniq -c
->> ~~~
->> {: .bash}
+>>    ~~~
+>>    cut -f5 SraRunTable.txt | grep -v LoadDate_s | sort | uniq -c
+>>    ~~~
+>>    {: .bash}
 >>
->> ~~~
->>  6 25-Jul-12
->> 31 29-May-14
->> ~~~
->> {: .output}
+>>    ~~~
+>>     6 25-Jul-12
+>>    31 29-May-14
+>>    ~~~
+>>    {: .output}
 >>
 > {: .solution}
 {: .challenge}
@@ -612,8 +595,80 @@ $ grep PAIRED SraRunTable.txt > SraRunTable_only_paired_end.txt
 > 
 > > ## Solution
 > > 
-> > `grep 25-Jul-12 SraRunTable.txt > SraRunTable_25-Jul-12.txt`  
-> > `grep 29-May-14 SraRunTable.txt > SraRunTable_29-May-14.txt`
+> > ~~~ 
+> > $ grep 25-Jul-12 SraRunTable.txt > SraRunTable_25-Jul-12.txt
+> > $ grep 29-May-14 SraRunTable.txt > SraRunTable_29-May-14.txt
+> > ~~~
+> > {: .bash}
 > >
 > {: .solution}
 {: .challenge}
+
+## Writing for loops
+
+Loops are key to productivity improvements through automation as they allow us to execute commands repeatedly. 
+Similar to wildcards and tab completion, using loops also reduces the amount of typing (and typing mistakes). 
+Loops are helpful when performing operations on groups of sequencing files, such as unzipping or trimming multiple
+files. We will use loops for these purposes in subsequent analyses, but will cover the basics of them for now.
+
+When the shell sees the keyword `for`, it knows to repeat a command (or group of commands) once for each item in a list. 
+Each time the loop runs (called an iteration), an item in the list is assigned in sequence to the **variable**, and 
+the commands inside the loop are executed, before moving on to  the next item in the list. Inside the loop, we call for 
+the variable's value by putting `$` in front of it. The `$` tells the shell interpreter to treat the **variable**
+as a variable name and substitute its value in its place, rather than treat it as text or an external command. 
+
+Let's write a for loop to show us the first two lines of the fastq files we downloaded earlier. You will notice shell prompt changes from `$` to `>` and back again as we were typing in our loop. The second prompt, `>`, is different to remind us that we haven’t finished typing a complete command yet. A semicolon, `;`, can be used to separate two commands written on a single line.
+
+~~~
+$ cd ../untrimmed_fastq/
+~~~
+{: .bash}
+
+~~~
+$ for filename in *.fastq
+> do
+> head -n 2 ${filename}
+> done
+~~~
+{: .bash}
+
+The for loop begins with the formula `for <variable> in <group to iterate over>`. In this case, the word `filename` is designated 
+as the variable to be used over each iteration. In our case `SRR097977.fastq` and `SRR098026.fastq` will be substituted for `filename` 
+because they fit the pattern of ending with .fastq in directory we've specified. The next line of the for loop is `do`. The next line is 
+the code that we want to excute. We are telling the loop to print the first two lines of each variable we iterate over. Finally, the 
+word `done` ends the loop.
+
+After executing the loop, you should see the first two lines of both fastq files printed to the terminal. Let's create a loop that 
+will save this information to a file.
+
+~~~
+$ for filename in *.fastq
+> do
+> head -n 2 ${filename} >> seq_info.txt
+> done
+~~~
+{: .bash}
+
+Note that we are using `>>` to append the text to our `seq_info.txt` file. If we used `>`, the `seq_info.txt` file would be rewritten
+every time the loop iterates, so it would only have text from the last variable used. Instead, `>>` adds to the end of the file.
+
+### Using Basename in for loops
+
+Basename is a function in UNIX that is helpful for removing a uniform part of a name from a list of files. In this case, we will use
+basename to remove the `*.fastq` from the files that we've been working with. Inside our for loop, we create a new `name` variable.
+We call the `basename` function inside the parenthesis, then give our variable name from the for loop, in this case `$filename`, 
+and finally state that `.fastq` should be removed from the file name. It's important to note that we're not changing the actual files,
+we're creating and manipulating a new variable called `name`. The line `> echo $name` will print to the terminal the variable `name`
+each time the for loop runs. Because we are iterating over two files, we expect to see two lines of output.
+
+~~~
+$ for filename in *.fastq
+> do
+> name=$(basename ${filename} .fastq)
+> echo ${name}
+> done
+~~~
+{: .bash}
+
+Although the utility of basename may still seem unclear, it will become very useful in subsequent analysis, such as trimming many reads
+in a for loop.
