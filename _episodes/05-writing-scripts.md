@@ -14,6 +14,27 @@ keypoints:
 - Transferring information to and from virtual and local computers.
 ---
 
+<script language="javascript" type="text/javascript">
+function set_page_view_defaults() {
+    document.getElementById('div_win').style.display = 'block';
+    document.getElementById('div_unix').style.display = 'none';
+};
+
+function change_content_by_platform(form_control){
+    if (!form_control || document.getElementById(form_control).value == 'win') {
+        set_page_view_defaults();
+    } else if (document.getElementById(form_control).value == 'unix') {
+        document.getElementById('div_win').style.display = 'none';
+        document.getElementById('div_unix').style.display = 'block';
+    } else {
+        alert("Error: Missing platform value for 'change_content_by_platform()' script!");
+    }
+}
+
+window.onload = set_page_view_defaults;
+</script>
+
+
 ## Writing files
 
 We've been able to do a lot of work with files that already exist, but what if we want to write our own files. We're not going to type in a FASTA file, but we'll see as we go through other tutorials, there are a lot of reasons we'll want to write a file, or edit an existing file.
@@ -106,11 +127,11 @@ Now you've written a file. You can take a look at it with `less` or `cat`, or op
 
 ## Writing scripts
 
-A really powerful thing about the command line is that you can write scripts. Scripts let you save commands to run them and also lets you put multiple commands together. Scripts let you save commands to run them and also let you put multiple commands together. Though writing scripts may require an additional time investment initially, this can save you time as you run them repeatedly. Scripts can also address the challenge of reproducibility: if you need to repeat an analysis, you retain a record of your command history within the script.
+A really powerful thing about the command line is that you can write scripts. Scripts let you save commands to run them and also lets you put multiple commands together. Though writing scripts may require an additional time investment initially, this can save you time as you run them repeatedly. Scripts can also address the challenge of reproducibility: if you need to repeat an analysis, you retain a record of your command history within the script.
 
 One thing we will commonly want to do with sequencing results is pull out bad reads and write them to a file to see if we can figure out what's going on with them. We're going to look for reads with long sequences of N's like we did before, but now we're going to write a script, so we can run it each time we get new sequences, rather than type the code in by hand each time.
 
-Bad reads have a lot of N's, so we're going to look for  `NNNNNNNNNN` with `grep`. We want the whole FASTQ record, so we're also going to get the one line above the sequence and the two lines below. We also want to look in all the files that end with `.fastq`, so we're going to use the `*` wild card.
+Bad reads have a lot of N's, so we're going to look for  `NNNNNNNNNN` with `grep`. We want the whole FASTQ record, so we're also going to get the one line above the sequence and the two lines below. We also want to look in all the files that end with `.fastq`, so we're going to use the `*` wildcard.
 
 ~~~
 grep -B1 -A2 NNNNNNNNNN *.fastq > scripted_bad_reads.txt
@@ -135,43 +156,6 @@ $ bash bad-reads-script.sh
 
 It will look like nothing happened, but now if you look at `scripted_bad_reads.txt`, you can see that there are now reads in the file.
 
-> ## Exercise
-> 
-> 1. How many bad reads are there in the two FASTQ files combined? 
-> 2. How many bad reads are in each of the two FASTQ files? (Hint: You will need to use the
-> `cut` command with the `-d` flag.)
-> 
-> > ## Solution
-> > 
-> > 1. There are 537 / 4 bad reads in the two files combined.
-> >    
-> >    ~~~
-> >    $ wc -l scripted_bad_reads.txt
-> >    ~~~
-> >    {: .bash}
-> >
-> >    ~~~
-> >    537 scripted_bad_reads.txt
-> >    ~~~
-> >    {: .output}
-> >    
-> >    If you look closely, you will see that there is a `--` delimiter inserted between the non-consecutive matches to grep. This accounts for the extra line. So there are 536 / 4 = 134 total bad reads.
-> > 
-> > 2. There are 536 / 4 bad reads for the `SRR098026.fastq` file and none for the other file.
-> >
-> >    ~~~
-> >    $ cut -d . -f1 scripted_bad_reads.txt | sort | uniq -c
-> >    ~~~
-> >    {: .bash}
-> >
-> >    ~~~
-> >    1 --
-> >    536 SRR098026
-> >    ~~~
-> >    {: .output}
-> {: .solution}
-{: .challenge}
-
 
 > ## Exercise
 >
@@ -182,8 +166,7 @@ It will look like nothing happened, but now if you look at `scripted_bad_reads.t
 
 ## Making the script into a program
 
-We had to type `bash` because we needed to tell the computer what program to use to run this script. Instead we can turn this script into its own program. We need to tell it that it's a program by making it executable. We can do this by changing the file permissions. We
-talked about permissions in [an earlier episode](http://www.datacarpentry.org/shell-genomics/03-working-with-files/).
+We had to type `bash` because we needed to tell the computer what program to use to run this script. Instead we can turn this script into its own program. We need to tell it that it's a program by making it executable. We can do this by changing the file permissions. We talked about permissions in [an earlier episode](http://www.datacarpentry.org/shell-genomics/03-working-with-files/).
 
 First, let's look at the current permissions.
 
@@ -225,7 +208,7 @@ $ ./bad-reads-script.sh
 
 The script should run the same way as before, but now we've created our very own computer program!
 
-You will learn more about writing scripts in [a later lesson](http://www.datacarpentry.org/wrangling-genomics/02-automating_a_workflow/).
+You will learn more about writing scripts in [a later lesson](https://datacarpentry.org/wrangling-genomics/05-automation/index.html).
 
 ## Moving and Downloading Data
 
@@ -326,7 +309,16 @@ should not be logged into your instance, it should be showing your local compute
 using a transfer program, it needs to be installed on your local machine, not your instance.**
 
 ## Transferring Data Between your Local Machine and the Cloud
-### scp
+
+These directions are platform specific so please follow the instructions for your system:
+
+**Please select the platform you wish to use for the exercises: <select id="id_platform" name="platformlist" onchange="change_content_by_platform('id_platform');return false;"><option value="unix" id="id_unix" selected> UNIX </option><option value="win" id="id_win" selected> Windows </option></select>**
+
+
+
+<div id="div_unix" style="display:block" markdown="1">
+
+### Uploading Data to your Virtual Machine with scp
 
 `scp` stands for 'secure copy protocol', and is a widely used UNIX tool for moving files
 between computers. The simplest way to use `scp` is to run it in your local terminal,
@@ -376,25 +368,20 @@ $ find ~ -name *.txt
 1. Download the bad reads file in ~/shell_data/scripted_bad_reads.txt to your home ~/Download directory using the following command **(make sure you use substitute dcuser@ ip.address with your remote login credentials)**:
 
 ~~~
-$ scp dcuser@ip.address:/home/dcuser/shell_data/scripted_bad_reads.txt. ~/Downloads
+$ scp dcuser@ip.address:/home/dcuser/shell_data/untrimmed_fastq/scripted_bad_reads.txt. ~/Downloads
 ~~~
 {: .bash}
 
 Remember that in both instances, the command is run from your local machine, we've just flipped the order of the to and from parts of the command.
 </div>
 
-These directions are platform specific so please follow the instructions for your system:
 
-**Please select the platform you wish to use for the exercises: <select id="id_platform" name="platformlist" onchange="change_content_by_platform('id_platform');return false;"><option value="aws_unix" id="id_aws_unix" selected> AWS_UNIX </option><option value="aws_win" id="id_aws_win" selected> AWS_Windows </option></select>**
-
-
-<div id="div_aws_win" style="display:block" markdown="1">
-
+<div id="div_win" style="display:block" markdown="1">
 
 ### Uploading Data to your Virtual Machine with PSCP
 
 If you're using a PC, we recommend you use the *PSCP* program. This program is from the same suite of
-tools as the putty program we have been using to connect.
+tools as the PuTTY program we have been using to connect.
 
 1. If you haven't done so, download pscp from [http://the.earth.li/~sgtatham/putty/latest/x86/pscp.exe](http://the.earth.li/~sgtatham/putty/latest/x86/pscp.exe)
 2. Make sure the *PSCP* program is somewhere you know on your computer. In this case,
@@ -409,27 +396,23 @@ go to your start menu/search enter the term **'cmd'**; you will be able to start
 ~~~
 {: .bash}
 
-5. Locate a file on your computer that you wish to upload (be sure you know the path). Then upload it to your remote machine **(you will need to know your ip address, and login credentials)**. You will be prompted to enter a password, and then your upload will begin. **(make sure you use substitute 'your-pc-username' for your actual pc username)**
+5. Locate a file on your computer that you wish to upload (be sure you know the path). Then upload it to your remote machine **(you will need to know your AMI instance address (which starts with ec2), and login credentials)**. You will be prompted to enter a password, and then your upload will begin. **(make sure you use substitute 'your-pc-username' for your actual pc username and 'ec2-54-88-126-85.compute-1.amazonaws.com' with your AMI instance address)**
 
 ~~~
-C:\User\your-pc-username\Downloads> pscp.exe local_file.txt dcuser@ip.address:/home/dcuser/
+C:\User\your-pc-username\Downloads> pscp.exe local_file.txt dcuser@ec2-54-88-126-85.compute-1.amazonaws.com:/home/dcuser/
 ~~~
 {: .bash}
 
 ### Downloading Data from your Virtual Machine with PSCP
 
 1. Follow the instructions in the Upload section to download (if needed) and access the *PSCP* program (steps 1-3)
-2. Download the text file using the following command **(make sure you use substitute 'your-pc-username' for your actual pc username and dcuser@ ip.address with your remote login credentials)**
+2. Download the text file using the following command **(make sure you use substitute 'your-pc-username' for your actual pc username and 'ec2-54-88-126-85.compute-1.amazonaws.com' with your AMI instance address)**
 
 ~~~
-C:\User\your-pc-username\Downloads> pscp.exe dcuser@ip.address:/home/dcuser/shell_data/scripted_bad_reads.txt.
+C:\User\your-pc-username\Downloads> pscp.exe dcuser@ec2-54-88-126-85.compute-1.amazonaws.com:/home/dcuser/shell_data/untrimmed_fastq/scripted_bad_reads.txt.
 
 C:\User\your-pc-username\Downloads
 ~~~
 {: .bash}
 
 </div>
-
-
-
-<div id="div_aws_unix" style="display:block" markdown="1">

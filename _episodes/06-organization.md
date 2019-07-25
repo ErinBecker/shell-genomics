@@ -116,7 +116,7 @@ dc_workshop/results:
 
 # Organizing your files
 
-Before begining any analysis, it's important to save a copy of your 
+Before beginning any analysis, it's important to save a copy of your
 raw data. The raw data should never be changed. Regardless of how
 sure you are that you want to carry out a particular data cleaning
 step, there's always the chance that you'll change your mind later 
@@ -169,9 +169,19 @@ $ history | tail -n 7
 ~~~
 {: .bash}
 
-Using your knowledge of the shell, use the append redirect `>>` to create a file called
-`dc_workshop_log_XXXX_XX_XX.sh` (Use the four-digit year, two-digit month, and two digit day, e.g.
-`dc_workshop_log_2017_10_27.sh`)  
+> ## Exercise
+> Using your knowledge of the shell, use the append redirect `>>` to create a file called
+> `dc_workshop_log_XXXX_XX_XX.sh` (Use the four-digit year, two-digit month, and two digit day, e.g.
+> `dc_workshop_log_2017_10_27.sh`)  
+> > 
+> > ## Solution
+> > ~~~
+> > $ history | tail -n 8 >> dc_workshop_log_2017_10_27.sh
+> > ~~~
+> > {: .bash}
+> > Note we used the last 7 lines as an example, the number of lines may vary.
+> {: .solution}
+{: .challenge}
 
 You may have noticed that your history contains the `history` command itself. To remove this redundancy
 from our log, let's use the `nano` text editor to fix the file:  

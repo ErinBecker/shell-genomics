@@ -9,7 +9,7 @@ questions:
 - "How can I repeat recently used commands?"
 objectives:
 - View, search within, copy, move, and rename files. Create new directories.
-- Use wild cards (`*`) to perform operations on multiple files.
+- Use wildcards (`*`) to perform operations on multiple files.
 - Make a file read only
 - Use the `history` command to view and repeat recently used commands.
 keypoints:
@@ -27,7 +27,7 @@ Now that we know how to navigate around our directory structure, lets
 start working with our sequencing files. We did a sequencing experiment and 
 have two results files, which are stored in our `untrimmed_fastq` directory. 
 
-### Wild cards
+### Wildcards
 
 Navigate to your `untrimmed_fastq` directory.
 
@@ -65,21 +65,6 @@ SRR097977.fastq
 {: .output}
 
 lists only the file that ends with `977.fastq`.
-
-We can use the command `echo` to see how the wildcard character is intepreted by the
-shell.
-
-~~~
-$ echo *.fastq
-~~~
-{: .bash}
-
-~~~
-SRR097977.fastq SRR098026.fastq
-~~~
-{: .output}
-
-The `*` is expanded to include any file that ends with `.fastq`.
 
 This command:
 
@@ -131,6 +116,49 @@ Lists every file in `/usr/bin` that ends in the characters `.sh`.
 > > 2. `ls /usr/bin/*a*`
 > > 3. `ls /usr/bin/*o`  
 > > Bonus: `ls /usr/bin/*[ac]*`
+> > 
+> {: .solution}
+{: .challenge}
+
+> ## Exercise
+> We can use the command `echo` to see how the wildcard character is interpreted by the shell.
+> 
+> ~~~
+> $ echo *.fastq
+> ~~~
+> {: .bash}
+> 
+> ~~~
+> SRR097977.fastq SRR098026.fastq
+> ~~~
+> {: .output}
+> 
+> The `*` is expanded to include any file that ends with `.fastq`. We can see that the output of
+> `echo *.fastq` is the same as of `ls *.fastq`.
+> 
+> What would the output look like if the wildcard could *not* be matched? Compare the outputs of
+> `echo *.missing` and `ls *.missing`.
+> 
+> > ## Solution
+> > ~~~
+> > $ echo *.missing
+> > ~~~
+> > {: .bash}
+> > 
+> > ~~~
+> > *.missing
+> > ~~~
+> > {: .output}
+> > 
+> > ~~~
+> > $ ls *.missing
+> > ~~~
+> > {: .bash}
+> > 
+> > ~~~
+> > ls: cannot access '*.missing': No such file or directory
+> > ~~~
+> > {: .output}
 > > 
 > {: .solution}
 {: .challenge}
@@ -215,7 +243,7 @@ This will print out all of the contents of the `SRR098026.fastq` to the screen.
 > the `~/shell_data/untrimmed_fastq` directory.
 > 
 > > ## Solution
-> > 1. The last line of the file is `TC:CCC::CCCCCCCC<8?6A:C28C<608'&&&,'$`.
+> > 1. The last line of the file is `C:CCC::CCCCCCCC<8?6A:C28C<608'&&&,'$`.
 > > 2. `cat ~/shell_data/untrimmed_fastq/*`
 > {: .solution}
 {: .challenge}
@@ -359,7 +387,7 @@ We can view the first complete read in one of the files our dataset by using `he
 the first four lines.
 
 ~~~
-$ head -n4 SRR098026.fastq
+$ head -n 4 SRR098026.fastq
 ~~~
 {: .bash}
 
@@ -375,7 +403,7 @@ All but one of the nucleotides in this read are unknown (`N`). This is a pretty 
 
 Line 4 shows the quality for each nucleotide in the read. Quality is interpreted as the 
 probability of an incorrect base call (e.g. 1 in 10) or, equivalently, the base call 
-accuracy (eg 90%). To make it possible to line up each individual nucleotide with its quality
+accuracy (e.g. 90%). To make it possible to line up each individual nucleotide with its quality
 score, the numerical score is converted into a code where each individual character 
 represents the numerical quality score for an individual nucleotide. For example, in the line
 above, the quality score line is: 
@@ -388,13 +416,13 @@ above, the quality score line is:
 The `#` character and each of the `!` characters represent the encoded quality for an 
 individual nucleotide. The numerical value assigned to each of these characters depends on the 
 sequencing platform that generated the reads. The sequencing machine used to generate our data 
-uses the standard Sanger quality PHRED score encoding, using by Illumina version 1.8 onwards.
-Each character is assigned a quality score between 0 and 40 as shown in the chart below.
+uses the standard Sanger quality PHRED score encoding, Illumina version 1.8 onwards.
+Each character is assigned a quality score between 0 and 42 as shown in the chart below.
 
 ~~~
-Quality encoding: !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHI
+Quality encoding: !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJK
                   |         |         |         |         |
-Quality score:    0........10........20........30........40                                
+Quality score:    0........10........20........30........40..                          
 ~~~
 {: .output}
 
@@ -578,7 +606,7 @@ you will be asked whether you want to override your permission settings.
 > 1. Make sure that you have deleted your backup directory and all files it contains.  
 > 2. Create a copy of each of your FASTQ files. (Note: You'll need to do this individually for each of the two FASTQ files. We haven't 
 > learned yet how to do this
-> with a wild-card.)  
+> with a wildcard.)  
 > 3. Use a wildcard to move all of your backup files to a new backup directory.   
 > 4. Change the permissions on all of your backup files to be write-protected.  
 >

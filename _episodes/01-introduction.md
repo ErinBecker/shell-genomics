@@ -161,19 +161,23 @@ $ pwd
 ~~~
 {: .output}
 
-Let's look at how our file system is organized.  
-
-At the top is our `dcuser` directory, which holds all the 
-subdirectories and files.
-
-Inside that directory there is currently one other directory:
+Let's look at how our file system is organized. We can see what files and subdirectories are in this directory by running `ls`,
+which stands for "listing":
 
 ~~~
-shell_data
+$ ls
+~~~
+{: .bash}
+
+~~~
+R  r_data  shell_data
 ~~~
 {: .output}
 
-We'll be working with this subdirectory, and creating new subdirectories, throughout this workshop.  
+`ls` prints the names of the files and directories in the current directory in
+alphabetical order,
+arranged neatly into columns. 
+We'll be working within the `shell_data` subdirectory, and creating new subdirectories, throughout this workshop.  
 
 The command to change locations in our file system is `cd` followed by a
 directory name to change our working directory.
@@ -187,8 +191,7 @@ $ cd shell_data
 ~~~
 {: .bash}
 
-We can see files and subdirectories are in this directory by running `ls`,
-which stands for "listing":
+Let's look at what is in this directory:
 
 ~~~
 $ ls
@@ -200,10 +203,7 @@ sra_metadata  untrimmed_fastq
 ~~~
 {: .output}
 
-`ls` prints the names of the files and directories in the current directory in
-alphabetical order,
-arranged neatly into columns.
-We can make its output more comprehensible by using the **flag** `-F`,
+We can make the `ls` output more comprehensible by using the **flag** `-F`,
 which tells `ls` to add a trailing `/` to the names of directories:
 
 ~~~
@@ -340,7 +340,7 @@ SRR097977.fastq  SRR098026.fastq
 {: .output}
 
 Tab completion can also fill in the names of programs, which can be useful if you
-remember the begining of a program name. 
+remember the beginning of a program name.
 
 ~~~
 $ pw<tab><tab>
